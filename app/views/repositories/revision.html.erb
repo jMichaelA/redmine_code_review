@@ -1,10 +1,12 @@
 <h2><%= avatar(@changeset.user, :size => "24") %><%= l(:label_revision) %> <%= format_revision(@changeset) %></h2>
 
 <div class="contextual">
+  
   <a href="" class="icon" style="background-image: url('http://localhost:3000/images/magnifier.png')" onclick="<!-- Should show review table-->">Create review</a>
-  <!-- <a href="" class="icon icon-time-add">Log time</a>
-  <a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a> -->  
-  <!-- <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete</a> -->
+  <a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a>  
+  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve review</a>
+  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject review</a>
+  <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete review</a>
 </div>
 
 <div class="issue">  
@@ -18,35 +20,97 @@
   
   <% if @changeset.scmid.present? || @changeset.parents.present? || @changeset.children.present? %>
   
-  <table class="revision-info">
-    <% if @changeset.scmid.present? %>
-      <tr>
-        <td style="font-weight: bold;">ID</td><td><%= h(@changeset.scmid) %></td>
-      </tr>
-    <% end %>
-    <% if @changeset.parents.present? %>
-      <tr>
-        <td style="font-weight: bold;"><%= l(:label_parent_revision) %></td>
-        <td>
-          <%= @changeset.parents.collect{
-                |p| link_to_revision(p, @repository, :text => format_revision(p))
-              }.join(", ").html_safe %>
-        </td>
-      </tr>
-    <% end %>
-    <% if @changeset.children.present? %>
-      <tr>
-        <td style="font-weight: bold;"><%= l(:label_child_revision) %></td>
-        <td>
-         <%= @changeset.children.collect{
-                |p| link_to_revision(p, @repository, :text => format_revision(p))
-               }.join(", ").html_safe %>
-        </td>
-      </tr>
-    <% end %>
+  <table class="attributes">
+    <tr>
+      <td>
+        <table class="attributes">
+          <% if @changeset.scmid.present? %>
+            <tr>
+              <td style="font-weight: bold;">ID:</td>
+              <td class="status"><%= h(@changeset.scmid) %></td>
+            </tr>
+          <% end %>
+          <% if @changeset.parents.present? %>
+            <tr>
+              <th style="font-weight: bold;"><%= l(:label_parent_revision) %>:</th>
+              <td>
+                <%= @changeset.parents.collect{
+                      |p| link_to_revision(p, @repository, :text => format_revision(p))
+                    }.join(", ").html_safe %>
+              </td>
+              
+              
+            </tr>
+          <% end %>
+          <% if @changeset.children.present? %>
+            <tr>
+              <td style="font-weight: bold;"><%= l(:label_child_revision) %>:</td>
+              <td>
+               <%= @changeset.children.collect{
+                      |p| link_to_revision(p, @repository, :text => format_revision(p))
+                     }.join(", ").html_safe %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      </td>
+      <td> 
+        <table class="review-info">
+          <!-- <tr>
+            <th>Status:</th>
+            <td>In progress</td>
+          </tr> -->
+          <tr>
+            <th>Priority:</th>
+            <td>Critical</td>
+          </tr>
+          <tr>
+            <th>Start date:</th>
+            <td>01/09/2015</td>
+          </tr>
+          <tr>
+            <th>Due date:</th>
+            <td>01/21/2015</td>
+          </tr>
+          <tr>
+            <th>% Done:</th>
+            <td>
+              <table class="progress progress-" style="width: 80px;">
+                <tbody>
+                  <tr>
+                    <td class="closed" style="width: 80%;"></td>
+                    <td class="todo" style="width: 20%;"></td>
+                  </tr>
+                </tbody>
+              </table>80%
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <table>
+          <thead>
+            <th>Participants:</th>
+          </thead>
+          <tbody style="padding-left: 30px;">
+            <tr>
+              <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
+              <td style="font-weight: bold; text-decoration: underline;">Observers (<a href="">Add</a>)</td>
+            </tr>
+            <tr>
+              <td>Jacob Christensen</td>
+              <td>Riley Oakden</td>
+            </tr>
+            <tr>
+              <td>Jordan Devenport</td>
+              <td>Jonathan Koyle</td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
   </table>
-  <% end %> 
-  
+  <% end %>
   <hr />
   <% if @changeset.issues.visible.any? || User.current.allowed_to?(:manage_related_issues, @repository.project) %>
     <%= render :partial => 'related_issues' %>
@@ -54,7 +118,7 @@
 </div>
 <table>
   <tr>
-    <td>
+    <td valign="top">
       <div style="border: 1px solid black;">
         <% if User.current.allowed_to?(:browse_repository, @project) %>
           <h3><%= l(:label_attachment_plural) %></h3>
@@ -554,6 +618,10 @@
 
 <% content_for :header_tags do %>
   <%= stylesheet_link_tag "scm" %>
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'review', :plugin => 'redmine_code_review' %>
 <% end %>
 
 <%

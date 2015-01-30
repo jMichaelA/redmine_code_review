@@ -1,5 +1,5 @@
 Redmine::Plugin.register :redmine_code_review do
-  name 'Redmine Code Review plugin'
+  name 'Redmine Code Review'
   author 'Jacob Christensen, Riley Oakden, Jonathan Koyle, and Jordan Devenport'
   description 'Code review plugin for Redmine'
   version '0.0.1'
