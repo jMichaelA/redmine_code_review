@@ -1,631 +1,103 @@
-<h2><%= avatar(@changeset.user, :size => "24") %><%= l(:label_revision) %> <%= format_revision(@changeset) %></h2>
-
 <div class="contextual">
-  
-  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/magnifier.png')" onclick="<!-- Should show review table-->">Create review</a>
-  <a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a>  
-  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve review</a>
-  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject review</a>
-  <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete review</a>
+  &#171;
+  <% unless @changeset.previous.nil? -%>
+      <%= link_to_revision(@changeset.previous, @repository, :text => l(:label_previous)) %>
+  <% else -%>
+      <%= l(:label_previous) %>
+  <% end -%>
+  |
+  <% unless @changeset.next.nil? -%>
+      <%= link_to_revision(@changeset.next, @repository, :text => l(:label_next)) %>
+  <% else -%>
+      <%= l(:label_next) %>
+  <% end -%>
+  &#187;&nbsp;
+
+  <%= form_tag({:controller => 'repositories',
+                :action     => 'revision',
+                :id         => @project,
+                :repository_id => @repository.identifier_param,
+                :rev        => nil},
+               :method     => :get) do %>
+      <%= text_field_tag 'rev', @rev, :size => 8 %>
+      <%= submit_tag 'OK', :name => nil %>
+  <% end %>
 </div>
 
-<div class="issue">  
-  <h3><%= @changeset.comments %></h3>
-  
-  <p>
-  <span class="author">
-    Committed by <%= link_to_user(@changeset.author) %> <%= time_tag(@changeset.committed_on).html_safe %> ago.
-  </span>
-  </p>
-  
-  <% if @changeset.scmid.present? || @changeset.parents.present? || @changeset.children.present? %>
-  
-  <table class="attributes">
-    <tr>
-      <td>
-        <table class="attributes">
-          <% if @changeset.scmid.present? %>
-            <tr>
-              <td style="font-weight: bold;">ID:</td>
-              <td class="status"><%= h(@changeset.scmid) %></td>
-            </tr>
-          <% end %>
-          <% if @changeset.parents.present? %>
-            <tr>
-              <th style="font-weight: bold;"><%= l(:label_parent_revision) %>:</th>
-              <td>
-                <%= @changeset.parents.collect{
-                      |p| link_to_revision(p, @repository, :text => format_revision(p))
-                    }.join(", ").html_safe %>
-              </td>
-              
-              
-            </tr>
-          <% end %>
-          <% if @changeset.children.present? %>
-            <tr>
-              <td style="font-weight: bold;"><%= l(:label_child_revision) %>:</td>
-              <td>
-               <%= @changeset.children.collect{
-                      |p| link_to_revision(p, @repository, :text => format_revision(p))
-                     }.join(", ").html_safe %>
-              </td>
-            </tr>
-          <% end %>
-        </table>
-      </td>
-      <td> 
-        <table class="review-info">
-          <!-- <tr>
-            <th>Status:</th>
-            <td>In progress</td>
-          </tr> -->
+<h2 style="display: inline;"><%= avatar(@changeset.user, :size => "24") %><%= l(:label_revision) %> <%= format_revision(@changeset) %></h2>
+<%= link_to("Create review", "", :class => 'icon icon-details') %> <!-- TODO: (jchristensen) Add the correct link destination -->
+<br />
+<br />
+<% if @changeset.scmid.present? || @changeset.parents.present? || @changeset.children.present? %>
+    <table class="revision-info">
+      <% if @changeset.scmid.present? %>
           <tr>
-            <th>Priority:</th>
-            <td>Critical</td>
+            <td>ID</td><td><%= h(@changeset.scmid) %></td>
           </tr>
+      <% end %>
+      <% if @changeset.parents.present? %>
           <tr>
-            <th>Start date:</th>
-            <td>01/09/2015</td>
-          </tr>
-          <tr>
-            <th>Due date:</th>
-            <td>01/21/2015</td>
-          </tr>
-          <tr>
-            <th>% Done:</th>
+            <td><%= l(:label_parent_revision) %></td>
             <td>
-              <table class="progress progress-" style="width: 80px;">
-                <tbody>
-                  <tr>
-                    <td class="closed" style="width: 80%;"></td>
-                    <td class="todo" style="width: 20%;"></td>
-                  </tr>
-                </tbody>
-              </table>80%
+              <%= @changeset.parents.collect{
+                      |p| link_to_revision(p, @repository, :text => format_revision(p))
+              }.join(", ").html_safe %>
             </td>
           </tr>
-        </table>
-      </td>
-      <td>
-        <table>
-          <thead>
-            <th>Participants:</th>
-          </thead>
-          <tbody style="padding-left: 30px;">
-            <tr>
-              <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
-              <td style="font-weight: bold; text-decoration: underline;">Observers (<a href="">Add</a>)</td>
-            </tr>
-            <tr>
-              <td>Jacob Christensen</td>
-              <td>Riley Oakden</td>
-            </tr>
-            <tr>
-              <td>Jordan Devenport</td>
-              <td>Jonathan Koyle</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </table>
-  <% end %>
-  <hr />
-  <% if @changeset.issues.visible.any? || User.current.allowed_to?(:manage_related_issues, @repository.project) %>
+      <% end %>
+      <% if @changeset.children.present? %>
+          <tr>
+            <td><%= l(:label_child_revision) %></td>
+            <td>
+              <%= @changeset.children.collect{
+                      |p| link_to_revision(p, @repository, :text => format_revision(p))
+              }.join(", ").html_safe %>
+            </td>
+          </tr>
+      <% end %>
+    </table>
+<% end %>
+
+<p>
+<span class="author">
+<%= authoring(@changeset.committed_on, @changeset.author) %>
+</span>
+</p>
+
+<%= textilizable @changeset.comments %>
+
+<% if @changeset.issues.visible.any? || User.current.allowed_to?(:manage_related_issues, @repository.project) %>
     <%= render :partial => 'related_issues' %>
-  <% end %>
-</div>
-<table>
-  <tr>
-    <td valign="top">
-      <div style="border: 1px solid black;">
-        <% if User.current.allowed_to?(:browse_repository, @project) %>
-          <h3><%= l(:label_attachment_plural) %></h3>
-          
-          <ul style=" padding-left: 0px; font-size: 0.8em; margin: 0;">
-          	<li style="float: left; background-position: 5px 0;" class="change change-A"><%= l(:label_added)    %></li>
-          	<li style="float: left; background-position: 5px 0;" class="change change-M"><%= l(:label_modified) %></li>
-          	<li style="float: left; background-position: 5px 0;" class="change change-C"><%= l(:label_copied)   %></li>
-          	<li style="float: left; background-position: 5px 0;" class="change change-R"><%= l(:label_renamed)  %></li>
-          	<li style="float: left; background-position: 5px 0;" class="change change-D"><%= l(:label_deleted)  %></li>
-          </ul>
-          
-          <br />
-          <p><%= link_to(l(:label_view_diff),
-                         :action => 'diff',
-                         :id     => @project,
-                         :repository_id => @repository.identifier_param,
-                         :path   => "",
-                         :rev    => @changeset.identifier) if @changeset.filechanges.any? %></p>
-          
-          <div class="changeset-changes">
-          <%= render_changeset_changes %>
-          </div>
-        <% end %>
-      </div>
-    </td>
-    <td valign="top">
-      <div style="border: 1px solid black;">
-        
-        
-        <h2>File:  include/ssm/common/xteds/Xteds.hpp</h2>
+<% end %>
 
-      <!-- Choose view type -->
-      <form accept-charset="UTF-8" action="/projects/test/repository/revisions/aec7026534a1687488b5ddb82bb88ac068022523/diff/include/ssm/common/xteds/Xteds.hpp" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" value="✓" type="hidden"></div>
-      
-        <p>
-          View differences:
-          <label><input id="type_inline" name="type" onchange="this.form.submit()" value="inline" type="radio"> inline</label>
-          <label><input checked="checked" id="type_sbs" name="type" onchange="this.form.submit()" value="sbs" type="radio"> side by side</label>
-        </p>
-      </form>
+<% if User.current.allowed_to?(:browse_repository, @project) %>
+    <h3><%= l(:label_attachment_plural) %></h3>
+    <ul id="changes-legend">
+      <li class="change change-A"><%= l(:label_added)    %></li>
+      <li class="change change-M"><%= l(:label_modified) %></li>
+      <li class="change change-C"><%= l(:label_copied)   %></li>
+      <li class="change change-R"><%= l(:label_renamed)  %></li>
+      <li class="change change-D"><%= l(:label_deleted)  %></li>
+    </ul>
 
-<div class="autoscroll">
-<table class="filecontent">
-<thead>
-<tr>
-  <th colspan="4" class="filename">
-    include/ssm/common/xteds/Xteds.hpp
-  </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <th class="line-num">35</th>
-  <td class="line-code ">
-    <pre> * Mar 03, 2014  C. Salmon       / SDL  Uses PointerList&lt;&gt; for sub-elements
-</pre>
-  </td>
-  <th class="line-num">35</th>
-  <td class="line-code ">
-    <pre> * Mar 03, 2014  C. Salmon       / SDL  Uses PointerList&lt;&gt; for sub-elements
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">36</th>
-  <td class="line-code ">
-    <pre> * Apr 24, 2014  K. Fryar-Ludwig / SDL  Implemented deep copy constructor
-</pre>
-  </td>
-  <th class="line-num">36</th>
-  <td class="line-code ">
-    <pre> * Apr 24, 2014  K. Fryar-Ludwig / SDL  Implemented deep copy constructor
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">37</th>
-  <td class="line-code ">
-    <pre> * Nov 13, 2014  B. Holdaway     / SDL  Feature #3163: Modify the xTEDS schema to move the component name back into the Application or Device element
-</pre>
-  </td>
-  <th class="line-num">37</th>
-  <td class="line-code ">
-    <pre> * Nov 13, 2014  B. Holdaway     / SDL  Feature #3163: Modify the xTEDS schema to move the component name back into the Application or Device element
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-  <th class="line-num">38</th>
-  <td class="line-code diff_in">
-    <pre> * Jan 16, 2015  B. Holdaway     / SDL  Improvement #659: Migrate XtedsState to component level
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">38</th>
-  <td class="line-code ">
-    <pre> */
-</pre>
-  </td>
-  <th class="line-num">39</th>
-  <td class="line-code ">
-    <pre> */
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">39</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-  <th class="line-num">40</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">40</th>
-  <td class="line-code ">
-    <pre>#include &lt;string&gt;
-</pre>
-  </td>
-  <th class="line-num">41</th>
-  <td class="line-code ">
-    <pre>#include &lt;string&gt;
-</pre>
-  </td>
-</tr>
-<tr class="spacing">
-  <th class="line-num">...</th><td></td><th class="line-num">...</th><td></td>
-</tr>
-<tr>
-  <th class="line-num">60</th>
-  <td class="line-code ">
-    <pre>class Xteds
-</pre>
-  </td>
-  <th class="line-num">61</th>
-  <td class="line-code ">
-    <pre>class Xteds
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">61</th>
-  <td class="line-code ">
-    <pre>{
-</pre>
-  </td>
-  <th class="line-num">62</th>
-  <td class="line-code ">
-    <pre>{
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">62</th>
-  <td class="line-code ">
-    <pre>  public:
-</pre>
-  </td>
-  <th class="line-num">63</th>
-  <td class="line-code ">
-    <pre>  public:
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">63</th>
-  <td class="line-code diff_out">
-    <pre>    enum XtedsState
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">64</th>
-  <td class="line-code diff_out">
-    <pre>    {
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">65</th>
-  <td class="line-code diff_out">
-    <pre>      ACTIVATING,
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">66</th>
-  <td class="line-code diff_out">
-    <pre>      ACTIVE,
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">67</th>
-  <td class="line-code diff_out">
-    <pre>      CANCELING,
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">68</th>
-  <td class="line-code diff_out">
-    <pre>      CANCELED
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">69</th>
-  <td class="line-code diff_out">
-    <pre>    };
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">70</th>
-  <td class="line-code diff_out">
-    <pre></pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">71</th>
-  <td class="line-code ">
-    <pre>    Xteds();
-</pre>
-  </td>
-  <th class="line-num">64</th>
-  <td class="line-code ">
-    <pre>    Xteds();
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">72</th>
-  <td class="line-code ">
-    <pre>    Xteds(const Xteds&amp; toCopy);
-</pre>
-  </td>
-  <th class="line-num">65</th>
-  <td class="line-code ">
-    <pre>    Xteds(const Xteds&amp; toCopy);
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">73</th>
-  <td class="line-code ">
-    <pre>    ~Xteds();
-</pre>
-  </td>
-  <th class="line-num">66</th>
-  <td class="line-code ">
-    <pre>    ~Xteds();
-</pre>
-  </td>
-</tr>
-<tr class="spacing">
-  <th class="line-num">...</th><td></td><th class="line-num">...</th><td></td>
-</tr>
-<tr>
-  <th class="line-num">77</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-  <th class="line-num">70</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">78</th>
-  <td class="line-code ">
-    <pre>    std::string getString(void) const;
-</pre>
-  </td>
-  <th class="line-num">71</th>
-  <td class="line-code ">
-    <pre>    std::string getString(void) const;
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">79</th>
-  <td class="line-code ">
-    <pre>    void setString(std::string xml);
-</pre>
-  </td>
-  <th class="line-num">72</th>
-  <td class="line-code ">
-    <pre>    void setString(std::string xml);
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">80</th>
-  <td class="line-code diff_out">
-    <pre>    XtedsState getState(void) const;
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">81</th>
-  <td class="line-code diff_out">
-    <pre>    void setState(XtedsState state);
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">82</th>
-  <td class="line-code ">
-    <pre>    UInt32 getComponentCount(void);
-</pre>
-  </td>
-  <th class="line-num">73</th>
-  <td class="line-code ">
-    <pre>    UInt32 getComponentCount(void);
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">83</th>
-  <td class="line-code ">
-    <pre>    std::string toXml(Int8 tabLevel) const;
-</pre>
-  </td>
-  <th class="line-num">74</th>
-  <td class="line-code ">
-    <pre>    std::string toXml(Int8 tabLevel) const;
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">84</th>
-  <td class="line-code ">
-    <pre>    bool insertComponent(Component* pComponent);
-</pre>
-  </td>
-  <th class="line-num">75</th>
-  <td class="line-code ">
-    <pre>    bool insertComponent(Component* pComponent);
-</pre>
-  </td>
-</tr>
-<tr class="spacing">
-  <th class="line-num">...</th><td></td><th class="line-num">...</th><td></td>
-</tr>
-<tr>
-  <th class="line-num">105</th>
-  <td class="line-code ">
-    <pre>  private:
-</pre>
-  </td>
-  <th class="line-num">96</th>
-  <td class="line-code ">
-    <pre>  private:
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">106</th>
-  <td class="line-code ">
-    <pre>    void operator = (const Xteds&amp;);     //!&lt; Private and undefined to prevent use
-</pre>
-  </td>
-  <th class="line-num">97</th>
-  <td class="line-code ">
-    <pre>    void operator = (const Xteds&amp;);     //!&lt; Private and undefined to prevent use
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">107</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-  <th class="line-num">98</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">108</th>
-  <td class="line-code diff_out">
-    <pre>    XtedsState m_state;             //!&lt; The current state of the xTEDS.
-</pre>
-  </td>
-  <th class="line-num"></th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">109</th>
-  <td class="line-code ">
-    <pre>    std::string m_xmlString;        //!&lt; The XML string that was used to create this object
-</pre>
-  </td>
-  <th class="line-num">99</th>
-  <td class="line-code ">
-    <pre>    std::string m_xmlString;        //!&lt; The XML string that was used to create this object
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">110</th>
-  <td class="line-code ">
-    <pre>};
-</pre>
-  </td>
-  <th class="line-num">100</th>
-  <td class="line-code ">
-    <pre>};
-</pre>
-  </td>
-</tr>
-<tr>
-  <th class="line-num">111</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-  <th class="line-num">101</th>
-  <td class="line-code ">
-    <pre></pre>
-  </td>
-</tr>
-</tbody>
-</table>
+    <p><%= link_to(l(:label_view_diff),
+                   :action => 'diff',
+                   :id     => @project,
+                   :repository_id => @repository.identifier_param,
+                   :path   => "",
+                   :rev    => @changeset.identifier) if @changeset.filechanges.any? %></p>
 
-</div>
-
-
-
-
-        <p class="other-formats">Also available in:  <span><a href="/projects/test/repository/revisions/aec7026534a1687488b5ddb82bb88ac068022523/diff/include/ssm/common/xteds/Xteds.hpp?format=diff" class="diff" rel="nofollow">Unified diff</a></span>
-        </p>
-
-
-        
-        <div style="clear:both;"></div>
-    
-      </div>
-    </td>
-    <td valign="top" style="height: 100%;">
-      <div style="height: 100%; border: 1px solid black; width: 200px;">
-        Comments here...
-      </div>
-    </td>
-  </tr>
-</table>
-
-<% content_for :header_tags do %>
-  <%= stylesheet_link_tag "scm" %>
+    <div class="changeset-changes">
+      <%= render_changeset_changes %>
+    </div>
 <% end %>
 
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'review', :plugin => 'redmine_code_review' %>
+    <%= stylesheet_link_tag "scm" %>
 <% end %>
 
 <%
-  title = "#{l(:label_revision)} #{format_revision(@changeset)}"
-  title << " - #{@changeset.comments.truncate(80)}"
-  html_title(title)
- -%>
+   title = "#{l(:label_revision)} #{format_revision(@changeset)}"
+   title << " - #{@changeset.comments.truncate(80)}"
+   html_title(title)
+-%>
