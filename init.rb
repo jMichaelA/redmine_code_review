@@ -10,5 +10,5 @@ Redmine::Plugin.register :redmine_code_review do
     permission :view_reviews, :reviews => :index
   end
 
-  menu :project_menu, :redmine_code_review, { :controller => 'reviews', :action => 'index' }, :caption => 'Code review', :before => :repository, :param => :project_id
+  menu :project_menu, :redmine_code_review, { :controller => 'reviews', :action => 'index'}, :caption => 'Code review', :before => :repository
 end

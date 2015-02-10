@@ -1,7 +1,12 @@
 <h2>ReviewController#index</h2>
 
-<%= params[:id] %>
-
 Hello index view
+
+<% @reviews.each do |review| %>
+    <p>
+      <%= review.id %>
+      <%= review.created_on %>
+    </p>
+<% end %>
 
 

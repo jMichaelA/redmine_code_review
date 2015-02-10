@@ -1,6 +1,10 @@
 class ReviewsController < ApplicationController
   unloadable
 
+  layout 'base'
+  before_filter :find_project, :authorize
+  menu_item :redmine_code_review
+
   def index
     @reviews = Review.all
   end
@@ -25,5 +29,9 @@ class ReviewsController < ApplicationController
   #
   # def reject
   # end
+private
+  def find_project
+    @project=Project.find(params[:id])
+  end
 
 end

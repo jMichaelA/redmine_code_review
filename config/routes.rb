@@ -1,9 +1,9 @@
 # Plugin's routes
 # See: http://guides.rubyonrails.org/routing.html
 
-get 'reviews', :to => 'reviews#index'
-get 'reviews/new', :to => 'reviews#new'
-get 'reviews/:id', :to => 'reviews#show'
+match 'projects/:id/reviews', :to => 'reviews#index', :via => 'get'
+match 'projects/:id/reviews', :to => 'reviews#new', :via => 'get'
+match 'projects/:id/reviews', :to => 'reviews#show', :via => 'get'
 
 # TODO: (jchristensen)Something like this for the 'Create review' link on the revision page
-#post 'post/:revison/create', :to => 'reviews#create'
+#post 'post/:reviews/create', :to => 'reviews#create'
