@@ -13,7 +13,9 @@
   <h3><%= @changeset.comments %></h3>
 
   <p>
-    Committed by <%= link_to_user(@changeset.author) %> <%= time_tag(@changeset.committed_on).html_safe %> ago.
+    Revision committed by <%= link_to_user(@changeset.author) %> <%= time_tag(@changeset.committed_on).html_safe %> ago.
+    <br />
+    Review created by <%= link_to_user(@changeset.author) %> <%= time_tag(@review.created_on).html_safe %> ago.
   </p>
 
   <table class="attributes">
@@ -26,7 +28,7 @@
           </tr>
           <tr>
             <th>Creation date:</th>
-            <td>01/09/2015</td>
+            <td><%= @review.created_on %></td>
           </tr>
           <tr>
             <th>Due date:</th>
@@ -38,15 +40,15 @@
           </tr>
           <tr>
             <th>% Done:</th>
-            <td>
-              <table class="progress progress-" style="width: 80px;">
+            <td> <!-- TODO (jchristensen) Update this graph properly -->
+              <table class="progress progress-" style="width: 100px;">
                 <tbody>
                 <tr>
-                  <td class="closed" style="width: 80%;"></td>
-                  <td class="todo" style="width: 20%;"></td>
+                  <td class="closed" style="width: 70%;"></td>
+                  <td class="todo" style="width: 30%;"></td>
                 </tr>
                 </tbody>
-              </table>80%
+              </table>70%
             </td>
           </tr>
         </table>
@@ -101,8 +103,8 @@
         <!-- Looks like it I need to tie the file link on the side to the review controller somehow... -->
         <h2><%= l(:label_attachment) %>: <%=h @path %></h2>
 
+<% if false %> <!-- TODO (jchristensen) Figure out how to get the diff to show up properly... Eventually the files in the tree need to be linked to update this view
         <!-- Choose view type -->
-        <% if false %>
         <%= form_tag({:action => 'diff', :id => @project,
                       :repository_id => @repository.identifier_param,
                       :path => to_path_param(@path), :rev=> @rev}, :method => 'get') do %>
@@ -113,13 +115,12 @@
               <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
             </p>
         <% end %>
-            <% end %>
+
         <!-- These tags below create the diff -->
-        <% if false %>
         <% cache(@cache_key) do -%>
             <% render :partial => 'common/diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
         <% end -%>
-        <% end %>
+<% end %>
 
         <%# html_title(with_leading_slash(@path), 'Diff') -%>
 
@@ -128,6 +129,8 @@
     <td valign="top" style="height: 100%;">
       <div style="height: 100%; border: 1px solid black; width: 300px;">
         Comments here...
+        <br />
+        This better look good...
       </div>
     </td>
   </tr>
