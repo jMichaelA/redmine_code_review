@@ -6,16 +6,17 @@ class ReviewsController < ApplicationController
   menu_item :redmine_code_review
 
   helper RepositoriesHelper
+  helper ReviewHelper
 
   def index
 
   end
 
   def show
-    @review = Review.find(params[:review])
+    @review = Review.find(params[:review_id])
     @changeset = Changeset.find(@review.changeset_id)
     @repository = Repository.find(@changeset.repository_id)
-    
+
   end
 
   def new
