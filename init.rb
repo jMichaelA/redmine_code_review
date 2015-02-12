@@ -6,6 +6,7 @@ Redmine::Plugin.register :redmine_code_review do
   url 'https://github.com/jak103/redmine_code_review'
   author_url ''
 
+  # TODO (jchristensen) Add correct permissions so that only the right people can do/see/stuff reviews
   project_module :code_review do
     permission :view_reviews, :reviews => :index
   end
