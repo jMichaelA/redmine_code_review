@@ -97,43 +97,40 @@
         <%= render_review_changes %>
       </div>
     </td>
+    <% if @path %>
     <td valign="top" style="width: 100%;">
       <div style="border: 1px solid black;">
-        <!-- Somehow I need to add the context to this section so if knows which file it is looking at -->
-        <!-- Looks like it I need to tie the file link on the side to the review controller somehow... -->
+        <a href="<%= params[:review_id] %>" ><img src="http://localhost:3000/images/close.png" style="float: right;" /></a>
         <h2><%= l(:label_attachment) %>: <%=h @path %></h2>
+          <!-- Choose view type -->
+          <%= form_tag({:action => 'show',
+                        :id => @project,
+                        :repository_id => @repository.identifier_param,
+                        :path => to_path_param(@path),
+                        :rev=> @rev},
+                        :method => 'get') do %>
+              <%= hidden_field_tag('rev_to', params[:rev_to]) if params[:rev_to] %> <!-- TODO (jchristensen) Pretty sure we are never using the rev_to since we are just diffing the single revision -->
+              <p>
+                <%= l(:label_view_diff) %>:
+                <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
+                <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
+              </p>
+          <% end %>
 
- <!-- TODO (jchristensen) Figure out how to get the diff to show up properly... Eventually the files in the tree need to be linked to update this view
-        <!-- Choose view type -->
-        <%= form_tag({:action => 'show',
-                      :id => @project,
-                      :repository_id => @repository.identifier_param,
-                      :path => to_path_param(@path),
-                      :rev=> @rev},
-                      :method => 'get') do %>
-            <%= hidden_field_tag('rev_to', params[:rev_to]) if params[:rev_to] %> <!-- TODO (jchristensen) Pretty sure we are never using the rev_to since we are just diffing the single revision -->
-            <p>
-              <%= l(:label_view_diff) %>:
-              <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
-              <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
-            </p>
-        <% end %>
-
-        <!-- These tags below create the diff -->
-        <% cache(@cache_key) do -%>
-            <%= render :partial => 'diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
-        <% end -%>
-
-
-      </div>
+          <!-- These tags below create the diff -->
+          <% cache(@cache_key) do -%>
+              <%= render :partial => 'diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
+          <% end -%>
+        </div>
+      </td>
+      <td valign="top" style="height: 100%;">
+        <div style="height: 100%; border: 1px solid black; width: 300px;">
+          Comments here...
+          <br />
+          This better look good...
+        </div>
     </td>
-    <td valign="top" style="height: 100%;">
-      <div style="height: 100%; border: 1px solid black; width: 300px;">
-        Comments here...
-        <br />
-        This better look good...
-      </div>
-    </td>
+    <% end %>
   </tr>
 </table>
 
