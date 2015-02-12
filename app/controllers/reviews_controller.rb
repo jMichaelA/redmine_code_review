@@ -9,7 +9,8 @@ class ReviewsController < ApplicationController
   helper ReviewHelper
 
   def index
-
+    @reviews = Review.all()
+    @review_column_names = Review.column_names()
   end
 
   def show

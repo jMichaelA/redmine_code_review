@@ -1,5 +1,7 @@
 # Plugin's routes
 # See: http://guides.rubyonrails.org/routing.html
+post 'post/:revison/create', :to => 'reviews#create'
+get '/code_review', :to => 'code_review#index'
 
 #match 'projects/:id/reviews', :to => 'reviews#index', :via => 'get'
 #match 'projects/:id/reviews/new', :to => 'reviews#new', :via => 'get'

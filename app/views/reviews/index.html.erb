@@ -1,0 +1,68 @@
+
+<div id="main">
+  <div id="sidebar">
+
+  </div>
+  <div id="content">
+    <h2>Reviews</h2>
+    <%= form_tag({ :controller => 'reviews', :action => 'index', :project_id => @project },
+                 :method => :get, :id => 'query_form') do %>
+        <div id="query_form_with_buttons" class="hide-when-print">
+          <%= hidden_field_tag 'set_filter', '1' %>
+          <div id="query_form_content">
+            <fieldset id="filters" class="collapsible <%= "collapsed" %>">
+              <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+              <div style="<%= "display: none;" %>">
+
+              </div>
+            </fieldset>
+
+          </div>
+
+        </div>
+    <% end %>
+
+    <fieldset id="reviews">
+      <form>
+        <table>
+          <% @review_column_names.each do |column|  %>
+              <th>
+                <%= column %>
+              </th>
+          <% end %>
+          <% @reviews.each do |review| %>
+              <tr>
+                <td>
+                  <%= review.id %>
+                </td>
+                <td>
+                  <%= review.changeset.revision %>
+                </td>
+                <td>
+                  <%= review.tracker.name %>
+                </td>
+                <td>
+                  <%= review.project %>
+                </td>
+                <td>
+                  <%= review.due_date %>
+                </td>
+                <td>
+                  <%= review.priority_id %>
+                </td>
+                <td>
+                  <%= review.created_on %>
+                </td>
+                <td>
+                  <%= review.updated_on %>
+                </td>
+                <td>
+                  <%= review.closed %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+      </form>
+    </fieldset>
+  </div>
+</div>
