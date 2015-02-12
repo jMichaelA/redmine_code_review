@@ -1,7 +1,4 @@
 module ReviewHelper
-  def committing(created, author, options={})
-    l(options[:label] || "Committed by %{author} %{age} ago", :author => link_to_user(author), :age => time_tag(created)).html_safe
-  end
 
   def render_review_changes
     changes = @changeset.filechanges.limit(1000).reorder('path').collect do |change|
@@ -52,12 +49,12 @@ module ReviewHelper
       elsif c = tree[file][:c]
         style << " change-#{c.action}"
         path_param = to_path_param(@repository.relative_path(c.path))
-        text = link_to(h(text), :controller => 'repositories',
-                       :action => 'entry',
+        text = link_to(h(text), :controller => 'reviews',
+                       :action => 'show',
                        :id => @project,
                        :repository_id => @repository.identifier_param,
                        :path => path_param,
-                       :rev => @changeset.identifier) unless c.action == 'D'
+                       :rev => @changeset.identifier) if c.action == 'M'
         # TODO (jchristensen) Update this when we know if a file has been approved or not
         output << "<img width='11px' src='http://localhost:3000/images/magnifier.png' style='display: inline';> <img width='11px' src='http://localhost:3000/images/true.png' style='display: inline;'>"
         output << "<li class='#{style}' style='display: inline;'>#{text}</li><br />"

@@ -17,6 +17,10 @@ class ReviewsController < ApplicationController
     @changeset = Changeset.find(@review.changeset_id)
     @repository = Repository.find(@changeset.repository_id)
 
+    if params[:path]
+      diff
+    end
+
   end
 
   def new
@@ -37,9 +41,11 @@ class ReviewsController < ApplicationController
   # end
 
   def diff
+    @path = params[:path]
+    @rev = params[:rev]
     if params[:format] == 'diff'
       @diff = @repository.diff(@path, @rev, @rev_to)
-      (show_error_not_found; return) unless @diff
+      (review_show_error_not_found; return) unless @diff
       filename = "changeset_r#{@rev}"
       filename << "_r#{@rev_to}" if @rev_to
       send_data @diff.join, :filename => "#{filename}.diff",
@@ -54,11 +60,11 @@ class ReviewsController < ApplicationController
         User.current.pref[:diff_type] = @diff_type
         User.current.preference.save
       end
-      @cache_key = "repositories/diff/#{@repository.id}/" +
+      @cache_key = "reviews/show/#{@repository.id}/" +
           Digest::MD5.hexdigest("#{@path}-#{@rev}-#{@rev_to}-#{@diff_type}-#{current_language}")
       unless read_fragment(@cache_key)
         @diff = @repository.diff(@path, @rev, @rev_to)
-        show_error_not_found unless @diff
+        review_show_error_not_found unless @diff
       end
 
       @changeset = @repository.find_changeset_by_name(@rev)
@@ -70,7 +76,10 @@ class ReviewsController < ApplicationController
 private
   def find_project
     @project = Project.find(params[:id])
+  end
 
+  def review_show_error_not_found
+    render_error :message => l(:error_scm_not_found), :status => 404
   end
 
 end

@@ -103,12 +103,15 @@
         <!-- Looks like it I need to tie the file link on the side to the review controller somehow... -->
         <h2><%= l(:label_attachment) %>: <%=h @path %></h2>
 
-<% if false %> <!-- TODO (jchristensen) Figure out how to get the diff to show up properly... Eventually the files in the tree need to be linked to update this view
+ <!-- TODO (jchristensen) Figure out how to get the diff to show up properly... Eventually the files in the tree need to be linked to update this view
         <!-- Choose view type -->
-        <%= form_tag({:action => 'diff', :id => @project,
+        <%= form_tag({:action => 'show',
+                      :id => @project,
                       :repository_id => @repository.identifier_param,
-                      :path => to_path_param(@path), :rev=> @rev}, :method => 'get') do %>
-            <%= hidden_field_tag('rev_to', params[:rev_to]) if params[:rev_to] %>
+                      :path => to_path_param(@path),
+                      :rev=> @rev},
+                      :method => 'get') do %>
+            <%= hidden_field_tag('rev_to', params[:rev_to]) if params[:rev_to] %> <!-- TODO (jchristensen) Pretty sure we are never using the rev_to since we are just diffing the single revision -->
             <p>
               <%= l(:label_view_diff) %>:
               <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
@@ -118,11 +121,9 @@
 
         <!-- These tags below create the diff -->
         <% cache(@cache_key) do -%>
-            <% render :partial => 'common/diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
+            <%= render :partial => 'diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
         <% end -%>
-<% end %>
 
-        <%# html_title(with_leading_slash(@path), 'Diff') -%>
 
       </div>
     </td>
