@@ -1,18 +1,16 @@
 <h2><%= avatar(@changeset.user, :size => "24") %> Review #<%= params[:review_id] %></h2>
 
 <div class="contextual">
-
-  <a href="" class="icon" style="background-image: url('http://localhost:3000/images/magnifier.png')" onclick="<!-- Should show review table-->">Create review</a>
   <a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a>
   <a href="" class="icon" style="background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve review</a>
   <a href="" class="icon" style="background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject review</a>
-  <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete review</a>
+  <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete review</a> <!-- TODO (jchristensen) Only users with correct permissions should be able to delete the a review -->
 </div>
 
 <div class="issue">
   <h3><%= @changeset.comments %></h3>
 
-  <p>
+  <p> <!-- TODO (jchristensen) Find out if anyone wants this information here -->
     Revision committed by <%= link_to_user(@changeset.author) %> <%= time_tag(@changeset.committed_on).html_safe %> ago.
     <br />
     Review created by <%= link_to_user(@changeset.author) %> <%= time_tag(@review.created_on).html_safe %> ago.
@@ -56,12 +54,12 @@
       <td>
         <table>
           <thead>
-          <th>Participants:</th>
+            <th>Participants:</th>
           </thead>
           <tbody style="padding-left: 30px;">
           <tr>
             <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
-            <td style="font-weight: bold; text-decoration: underline;">Observers (<a href="">Add</a>)</td>
+            <td style="font-weight: bold; text-decoration: underline;">Watchers (<a href="">Add</a>)</td>
           </tr>
           <tr>
             <td>Jacob Christensen</td>
@@ -78,58 +76,53 @@
   </table>
 </div>
 
-<table>
+<table style="width: 100%;">
   <tr>
-    <td valign="top" style="width: 18%; border: 1px solid black;">
-      <h3><%= l(:label_attachment_plural) %></h3>
+    <td valign="top" style="width: 15%; border: 1px solid black; padding: 0px;"> <!-- TODO (jchristensen) Make this cell collapsible -->
+      <h3 style="margin: 0px; padding: 0px;"><%= l(:label_attachment_plural) %></h3>
 
-      <ul style=" padding-left: 0px; font-size: 0.8em; margin: 0;">
-        <li style="float: left; background-position: 5px 0;" class="change change-A"><%= l(:label_added)    %></li>
-        <li style="float: left; background-position: 5px 0;" class="change change-M"><%= l(:label_modified) %></li>
-        <li style="float: left; background-position: 5px 0;" class="change change-C"><%= l(:label_copied)   %></li>
-        <li style="float: left; background-position: 5px 0;" class="change change-R"><%= l(:label_renamed)  %></li>
-        <li style="float: left; background-position: 5px 0;" class="change change-D"><%= l(:label_deleted)  %></li>
+      <ul style=" padding-left: 0px; padding-bottom: 0px; font-size: 0.7em; margin: 0;">
+        <li style="float: left; background-position: 5px;" class="change change-A"><%= l(:label_added)    %></li>
+        <li style="float: left; background-position: 5px;" class="change change-M"><%= l(:label_modified) %></li>
+        <li style="float: left; background-position: 5px;" class="change change-C"><%= l(:label_copied)   %></li>
+        <li style="float: left; background-position: 5px;" class="change change-R"><%= l(:label_renamed)  %></li>
+        <li style="float: left; background-position: 5px;" class="change change-D"><%= l(:label_deleted)  %></li>
       </ul>
-
       <br />
-
       <div class="changeset-changes">
         <%= render_review_changes %>
       </div>
     </td>
     <% if @path %>
-    <td valign="top" style="width: 100%;">
-      <div style="border: 1px solid black;">
-        <a href="<%= params[:review_id] %>" ><img src="http://localhost:3000/images/close.png" style="float: right;" /></a>
-        <h2><%= l(:label_attachment) %>: <%=h @path %></h2>
-          <!-- Choose view type -->
-          <%= form_tag({:action => 'show',
-                        :id => @project,
-                        :repository_id => @repository.identifier_param,
-                        :path => to_path_param(@path),
-                        :rev=> @rev},
-                        :method => 'get') do %>
-              <%= hidden_field_tag('rev_to', params[:rev_to]) if params[:rev_to] %> <!-- TODO (jchristensen) Pretty sure we are never using the rev_to since we are just diffing the single revision -->
-              <p>
-                <%= l(:label_view_diff) %>:
-                <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
-                <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
-              </p>
-          <% end %>
+    <td valign="top" style="width: 70%; border: 1px solid black; padding-top: 0px;">
+      <a href="<%= params[:review_id] %>" ><img src="http://localhost:3000/images/close.png" style="float: right; display: inline;" /></a>
+      <% cache(@cache_key) do -%>
+          <%= render :partial => 'diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
+      <% end -%>
 
-          <!-- These tags below create the diff -->
-          <% cache(@cache_key) do -%>
-              <%= render :partial => 'diff', :locals => {:diff => @diff, :diff_type => @diff_type, :diff_style => @repository.class.scm_name} %>
-          <% end -%>
-        </div>
       </td>
-      <td valign="top" style="height: 100%;">
-        <div style="height: 100%; border: 1px solid black; width: 300px;">
-          Comments here...
-          <br />
-          This better look good...
-        </div>
-    </td>
+      <td valign="top" style="width: 15%; border: 1px solid black; padding-top: 0px;">
+        <table>
+          <thead><h3 style="margin: 0px; padding: 0px;">Comments</h3></thead>
+          <tbody>
+            <tr style="background-color: #eeeeee;">
+              <td>Jacob Christensen</td>
+              <td>1/5/2013 9:42 PM</td>
+            </tr>
+            <tr>
+              <td colspan="2">I don't think this is good because it doesn't really check for error cases. There are always errors so we should always check for them.</td>
+            </tr>
+            <tr style="background-color: #eeeeee;">
+              <td>Riley Oakden</td>
+              <td>1/5/2013 9:50 PM</td>
+            </tr>
+            <tr>
+              <td colspan="2">Good point, I'll update it so it checks for errors.</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </td>
     <% end %>
   </tr>
 </table>

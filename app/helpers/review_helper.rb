@@ -56,8 +56,7 @@ module ReviewHelper
                        :path => path_param,
                        :rev => @changeset.identifier) if c.action == 'M'
         # TODO (jchristensen) Update this when we know if a file has been approved or not
-        output << "<img width='11px' src='http://localhost:3000/images/magnifier.png' style='display: inline';> <img width='11px' src='http://localhost:3000/images/true.png' style='display: inline;'>"
-        output << "<li class='#{style}' style='display: inline;'>#{text}</li><br />"
+        output << "<li class='#{style}' style='background-position: 5px;  display: block;'>#{text}  <img width='11px' src='http://localhost:3000/images/magnifier.png';> <img width='11px' src='http://localhost:3000/images/true.png'></li>  "
       end
     end
     output << '</ul>'
