@@ -1,7 +1,7 @@
 # Plugin's routes
 # See: http://guides.rubyonrails.org/routing.html
-post 'post/:revison/create', :to => 'reviews#create'
-get '/code_review', :to => 'code_review#index'
+#post 'post/:revision/create', :to => 'reviews#create'
+#get '/code_review', :to => 'code_review#index'
 
 #match 'projects/:id/reviews', :to => 'reviews#index', :via => 'get'
 #match 'projects/:id/reviews/new', :to => 'reviews#new', :via => 'get'
@@ -9,7 +9,7 @@ get '/code_review', :to => 'code_review#index'
 
 get 'projects/:id/reviews', :to => 'reviews#index'
 get 'projects/:id/reviews/new', :to => 'reviews#new'
-get 'projects/:id/reviews/:review_id', :to => 'reviews#show'
+get 'projects/:id/reviews/:review_id', :to => 'reviews#show', :as => 'review'
 
 
 

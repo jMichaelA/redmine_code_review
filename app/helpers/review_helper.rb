@@ -1,7 +1,7 @@
 module ReviewHelper
 
   def render_review_changes
-    changes = @changeset.filechanges.limit(1000).reorder('path').collect do |change|
+    changes = @changeset.filechanges.reorder('path').collect do |change|
       case change.action
         when 'A'
           # Detects moved/copied files
@@ -34,6 +34,42 @@ module ReviewHelper
     render_review_tree(tree[:s])
   end
 
+  def render_review_files
+    files = @review.review_files
+    files.each do |file|
+      case file.change.action
+        when 'A'
+          # Detects moved/copied files
+          if !file.change.from_path.blank?
+            file.change.action =
+                @changeset.filechanges.detect {|c| c.action == 'D' && c.path == file.change.from_path} ? 'R' : 'C'
+          end
+          change
+        when 'D'
+          @changeset.filechanges.detect {|c| c.from_path == file.change.path} ? nil : file.change
+        else
+          file.change
+      end
+    end.compact
+
+    tree = { }
+    files.each do |file|
+      p = tree
+      dirs = file.change.path.to_s.split('/').select {|d| !d.blank?}
+      path = ''
+      dirs.each do |dir|
+        path += '/' + dir
+        p[:s] ||= {}
+        p = p[:s]
+        p[path] ||= {}
+        p = p[path]
+      end
+      p[:c] = file.change
+      p[:f] = file
+    end
+    render_review_tree(tree[:s])
+  end
+
   def render_review_tree(tree)
     return '' if tree.nil?
     output = ''
@@ -48,15 +84,14 @@ module ReviewHelper
         output << "</li>"
       elsif c = tree[file][:c]
         style << " change-#{c.action}"
-        path_param = to_path_param(@repository.relative_path(c.path))
+        id_param = tree[file][:f].id
         text = link_to(h(text), :controller => 'reviews',
                        :action => 'show',
                        :id => @project,
                        :repository_id => @repository.identifier_param,
-                       :path => path_param,
-                       :rev => @changeset.identifier) if c.action == 'M'
+                       :file_id => id_param) if c.action == 'M'
         # TODO (jchristensen) Update this when we know if a file has been approved or not
-        output << "<li class='#{style}' style='background-position: 5px;  display: block;'>#{text}  <img width='11px' src='http://localhost:3000/images/magnifier.png';> <img width='11px' src='http://localhost:3000/images/true.png'></li>  "
+        output << "<li class='#{style}' style='background-position: 5px;  display: block;'>#{text}  <img width='11px' src='http://localhost:3000/images/magnifier.png';> <img width='11px' src='http://localhost:3000/images/true.png'> <img width='11px' src='http://localhost:3000/images/false.png'></li>  "
       end
     end
     output << '</ul>'

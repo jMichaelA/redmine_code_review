@@ -18,8 +18,8 @@ class ReviewsController < ApplicationController
     @changeset = Changeset.find(@review.changeset_id)
     @repository = Repository.find(@changeset.repository_id)
 
-    if params[:path]
-      diff
+    if params[:file_id]
+      review_diff
     end
 
   end
@@ -41,45 +41,43 @@ class ReviewsController < ApplicationController
   # def reject
   # end
 
-  def diff
-    @path = params[:path]
-    @rev = params[:rev]
-    if params[:format] == 'diff'
-      @diff = @repository.diff(@path, @rev, @rev_to)
-      (review_show_error_not_found; return) unless @diff
-      filename = "changeset_r#{@rev}"
-      filename << "_r#{@rev_to}" if @rev_to
-      send_data @diff.join, :filename => "#{filename}.diff",
-                :type => 'text/x-patch',
-                :disposition => 'attachment'
-    else
-      @diff_type = params[:type] || User.current.pref[:diff_type] || 'inline'
-      @diff_type = 'inline' unless %w(inline sbs).include?(@diff_type)
+private
+  def review_diff
+    # Check that this file belongs to this review
+    @file = ReviewFile.get_by_review_and_file_id(params[:review_id], params[:file_id])
+    comments = @file.review_comments
 
-      # Save diff type as user preference
-      if User.current.logged? && @diff_type != User.current.pref[:diff_type]
-        User.current.pref[:diff_type] = @diff_type
-        User.current.preference.save
-      end
-      @cache_key = "reviews/show/#{@review.id}/" + Digest::MD5.hexdigest("#{@path}-#{@rev}-#{@rev_to}-#{@diff_type}-#{current_language}")
-      unless read_fragment(@cache_key)
-        @diff = @repository.diff(@path, @rev, @rev_to)
-        review_show_error_not_found unless @diff
-      end
-
-      @changeset = @repository.find_changeset_by_name(@rev)
-      @changeset_to = @rev_to ? @repository.find_changeset_by_name(@rev_to) : nil
-      @diff_format_revisions = @repository.diff_format_revisions(@changeset, @changeset_to)
+    if @file == nil
+      review_show_error_not_found("This file is not part of this review") unless @file
+      return nil
     end
+    @path = @file.change.path
+    @rev = @review.changeset.revision
+
+    @diff_type = params[:type] || User.current.pref[:diff_type] || 'inline'
+    @diff_type = 'inline' unless %w(inline sbs).include?(@diff_type)
+
+    # Save diff type as user preference
+    if User.current.logged? && @diff_type != User.current.pref[:diff_type]
+      User.current.pref[:diff_type] = @diff_type
+      User.current.preference.save
+    end
+    @cache_key = "reviews/show/#{@review.id}/" + Digest::MD5.hexdigest("#{@path}-#{@rev}-#{@diff_type}-#{current_language}")
+    unless read_fragment(@cache_key)
+      @diff = @repository.diff(@path, @rev, nil)
+      review_show_error_not_found("Diff not found") unless @diff
+    end
+
+    @changeset = @repository.find_changeset_by_name(@rev)
+    @diff_format_revisions = @repository.diff_format_revisions(@changeset, nil)
   end
 
-private
   def find_project
     @project = Project.find(params[:id])
   end
 
-  def review_show_error_not_found
-    render_error :message => l(:error_scm_not_found), :status => 404
+  def review_show_error_not_found(message)
+    render_error :message => message, :status => 404
   end
 
 end

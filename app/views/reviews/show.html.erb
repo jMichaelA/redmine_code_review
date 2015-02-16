@@ -13,7 +13,7 @@
   <p> <!-- TODO (jchristensen) Find out if anyone wants this information here -->
     Revision committed by <%= link_to_user(@changeset.author) %> <%= time_tag(@changeset.committed_on).html_safe %> ago.
     <br />
-    Review created by <%= link_to_user(@changeset.author) %> <%= time_tag(@review.created_on).html_safe %> ago.
+    Review created by <%= link_to_user(@review.creator) %> <%= time_tag(@review.created_on).html_safe %> ago.
   </p>
 
   <table class="attributes">
@@ -57,18 +57,34 @@
             <th>Participants:</th>
           </thead>
           <tbody style="padding-left: 30px;">
-          <tr>
-            <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
-            <td style="font-weight: bold; text-decoration: underline;">Watchers (<a href="">Add</a>)</td>
-          </tr>
-          <tr>
-            <td>Jacob Christensen</td>
-            <td>Riley Oakden</td>
-          </tr>
-          <tr>
-            <td>Jordan Devenport</td>
-            <td>Jonathan Koyle</td>
-          </tr>
+            <tr>
+              <td>
+                <table>
+                  <thead>
+                    <tr>
+                      <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @review.review_participants.each do |participant| -%>
+                      <tr><td> <%= link_to_user(participant.user) %></td></tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </td>
+              <td>
+                <table>
+                  <thead>
+                    <tr>
+                      <td style="font-weight: bold; text-decoration: underline;">Watchers (<a href="">Add</a>)</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Figure out how to get watchers</td></tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
           </tbody>
         </table>
       </td>
@@ -90,10 +106,10 @@
       </ul>
       <br />
       <div class="changeset-changes">
-        <%= render_review_changes %>
+        <%= render_review_files %>
       </div>
     </td>
-    <% if @path %>
+    <% if @file %>
     <td valign="top" style="width: 70%; border: 1px solid black; padding-top: 0px;">
       <a href="<%= params[:review_id] %>" ><img src="http://localhost:3000/images/close.png" style="float: right; display: inline;" /></a>
       <% cache(@cache_key) do -%>
@@ -102,24 +118,25 @@
 
       </td>
       <td valign="top" style="width: 15%; border: 1px solid black; padding-top: 0px;">
-        <table>
+        <table style="width: 100%;">
           <thead><h3 style="margin: 0px; padding: 0px;">Comments</h3></thead>
           <tbody>
+          <% @file.review_comments.each do |comment| -%>
             <tr style="background-color: #eeeeee;">
-              <td>Jacob Christensen</td>
-              <td>1/5/2013 9:42 PM</td>
+              <td><%= link_to_user(comment.author) %></td>
+              <td><%= time_tag(comment.created_on) %> ago</td>
             </tr>
             <tr>
-              <td colspan="2">I don't think this is good because it doesn't really check for error cases. There are always errors so we should always check for them.</td>
+              <td colspan="2"><%= comment.comment_text %></td>
             </tr>
-            <tr style="background-color: #eeeeee;">
-              <td>Riley Oakden</td>
-              <td>1/5/2013 9:50 PM</td>
-            </tr>
-            <tr>
-              <td colspan="2">Good point, I'll update it so it checks for errors.</td>
-            </tr>
-
+          <% end %>
+          <tr>
+            <td colspan="2"><textarea style="width: 98%; "></textarea> </td>
+          </tr>
+          <tr>
+            <td><input type="button" value="Comment"></td>
+            <td><input type="checkbox" value="Blocker"> Blocker</td>
+          </tr>
           </tbody>
         </table>
       </td>

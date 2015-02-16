@@ -11,8 +11,12 @@
           <tr>
             <th colspan="3" class="filename">
               <h3 style="margin: 0px; padding: 0px;"><%= table_file.file_name %></h3>
+              <div class="contextual" style=" float:left; padding-left: 0px;">
+                <a href="" class="icon" style="font-weight: normal; background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve file</a>
+                <a href="" class="icon" style="font-weight: normal; background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject file</a>
+              </div>
             </th>
-            <th class="filename" style="text-align: right;">
+            <th valign="top" class="filename" style="text-align: right; text-decoration: none;">
               <%= form_tag({:action => 'show',
                             :id => @project,
                             :repository_id => @repository.identifier_param,
@@ -25,7 +29,6 @@
                   <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
                 </p>
               <% end %>
-
             </th>
           </tr>
         </thead>
