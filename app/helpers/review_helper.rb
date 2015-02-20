@@ -44,13 +44,13 @@ module ReviewHelper
             file.change.action =
                 @changeset.filechanges.detect {|c| c.action == 'D' && c.path == file.change.from_path} ? 'R' : 'C'
           end
-          change
+          file.change
         when 'D'
           @changeset.filechanges.detect {|c| c.from_path == file.change.path} ? nil : file.change
         else
           file.change
       end
-    end.compact
+    end
 
     tree = { }
     files.each do |file|

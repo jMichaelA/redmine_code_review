@@ -16,7 +16,7 @@ class CreateReviews < ActiveRecord::Migration
         t.integer :user_id, :default => 0, :null => false
       end
 
-      create_table :review_file do |t|
+      create_table :review_files do |t|
         t.integer :review_id, :default => 0, :null => false
         t.integer :change_id, :default => 0, :null => false
         t.boolean :is_approved, :default => false, :null => false

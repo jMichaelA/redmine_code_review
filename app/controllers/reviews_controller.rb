@@ -28,6 +28,10 @@ class ReviewsController < ApplicationController
 
   end
 
+  def add_approver
+
+  end
+
   # TODO Uncomment and implement these when needed
   # def add_comment
   # end
