@@ -33,13 +33,19 @@
           <% @reviews.each do |review| %>
               <tr>
                 <td>
-                  <%= review.id %>
+                  <%= link_to_review(review) %>
                 </td>
                 <td>
-                  <%= review.changeset.revision %>
+                <% if review.changeset.present? %>
+                    <%= link_to_revision(review.changeset, review.changeset.repository,
+                                         :text => format_revision(review.changeset)) %>
+                <% end %>
                 </td>
                 <td>
                   <%= review.project %>
+                </td>
+                <td>
+                  <%= review.user %>
                 </td>
                 <td>
                   <%= review.due_date %>

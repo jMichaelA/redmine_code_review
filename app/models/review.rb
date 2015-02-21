@@ -8,6 +8,8 @@ class Review < ActiveRecord::Base
 
   validates_presence_of :changeset_id, :project_id, :priority_id
 
+  acts_as_watchable
+
   alias_attribute :creator, :user
 
   def comment(text)
