@@ -33,7 +33,7 @@
           <% @reviews.each do |review| %>
               <tr>
                 <td>
-                  <%= review.id %>
+                  <%= link_to_review(review) %>
                 </td>
                 <td>
                 <% if review.changeset.present? %>
