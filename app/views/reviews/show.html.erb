@@ -1,10 +1,11 @@
 <h2><%= avatar(@changeset.user, :size => "24") %> Review #<%= params[:review_id] %></h2>
-
 <div class="contextual">
-  <a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a>
+  <!--<a href="" class="issue-1-watcher icon icon-fav-off" data-method="post" data-remote="true" rel="nofollow">Watch</a>-->
+  <%= watcher_link(@review, User.current) %>
   <a href="" class="icon" style="background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve review</a>
   <a href="" class="icon" style="background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject review</a>
   <a href="" class="icon icon-del" data-confirm="Are you sure you want to delete the selected issue(s)?" data-method="delete" rel="nofollow">Delete review</a> <!-- TODO (jchristensen) Only users with correct permissions should be able to delete the a review -->
+
 </div>
 
 <div class="issue">

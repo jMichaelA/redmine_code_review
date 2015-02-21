@@ -5,6 +5,8 @@ class ReviewsController < ApplicationController
   before_filter :find_project # TODO (jchristensen) Add before_filter :authorize when ready
   menu_item :redmine_code_review
 
+  helper :watchers
+  include WatchersHelper
   helper RepositoriesHelper
   helper ReviewHelper
 
