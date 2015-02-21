@@ -9,8 +9,9 @@ class ReviewsController < ApplicationController
   helper ReviewHelper
 
   def index
-    @reviews = Review.all()
-    @review_column_names = Review.column_names()
+    @reviews = Review.where('project_id = ?', @project.id)
+    @review_column_names = ['#', 'Revision','Project', 'Submitted By', 'Due Date',
+                            'Priority', 'Created On', 'Updated', 'Closed']
   end
 
   def show
