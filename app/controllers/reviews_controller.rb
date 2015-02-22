@@ -31,6 +31,19 @@ class ReviewsController < ApplicationController
 
   end
 
+  def create_review
+    @review = Review.create(:changeset_id => params[:changeset_id], :project_id => @project.id, :user_id => params[:user_id], :priority_id => '2')
+    # create review files
+
+    @changefiles = Change.where("changeset_id = ?", @review.changeset_id)
+
+    @changefiles.each do |file|
+      ReviewFile.create(:review_id => @review.id, :change_id => file.id)
+    end
+
+    redirect_to review_path(:id => @project.id, :review_id => @review.id) # review that was just created
+  end
+
   # TODO Uncomment and implement these when needed
   # def add_comment
   # end

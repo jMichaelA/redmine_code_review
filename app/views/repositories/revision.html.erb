@@ -25,7 +25,7 @@
 </div>
 
 <h2 style="display: inline;"><%= avatar(@changeset.user, :size => "24") %><%= l(:label_revision) %> <%= format_revision(@changeset) %></h2>
-<%= link_to("Create review", "", :class => 'icon icon-details') %> <!-- TODO: (jchristensen) Add the correct link destination -->
+<%= link_to('Create review', {:controller => 'reviews', :action => 'new', :id => @project, :rev => @changeset.id },  :class => 'icon icon-details') %> <!-- TODO: (jchristensen) Add the correct link destination -->
 <br />
 <br />
 <% if @changeset.scmid.present? || @changeset.parents.present? || @changeset.children.present? %>
