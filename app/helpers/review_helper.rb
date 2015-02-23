@@ -98,7 +98,12 @@ module ReviewHelper
     output.html_safe
   end
 
-  def link_to_review(review)
-    link_to(review.id, {:controller => 'reviews', :action => 'show', :id => review.project, :review_id => review.id})
+  def link_to_review(review, options = {})
+    if options[:text].present?
+      text = options[:text]
+    else
+      text = review.id
+    end
+    link_to(text, {:controller => 'reviews', :action => 'show', :id => review.project, :review_id => review.id})
   end
 end

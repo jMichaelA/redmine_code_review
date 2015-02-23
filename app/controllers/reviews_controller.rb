@@ -12,7 +12,7 @@ class ReviewsController < ApplicationController
 
   def index
     @reviews = Review.where('project_id = ?', @project.id)
-    @review_column_names = ['#', 'Revision','Project', 'Submitted By', 'Due Date',
+    @review_column_names = ['#', 'Revision','Description', 'Submitted By', 'Due Date',
                             'Priority', 'Created On', 'Updated', 'Closed']
   end
 

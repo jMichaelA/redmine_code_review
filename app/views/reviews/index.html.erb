@@ -42,10 +42,12 @@
                 <% end %>
                 </td>
                 <td>
-                  <%= review.project %>
+                  <% if review.changeset.present? %>
+                    <%= link_to_review(review, :text => review.changeset.comments.truncate(40)) %>
+                  <% end %>
                 </td>
                 <td>
-                  <%= review.user %>
+                  <%= link_to_user(review.user) %>
                 </td>
                 <td>
                   <%= review.due_date %>
@@ -54,7 +56,7 @@
                   <%= review.priority_id %>
                 </td>
                 <td>
-                  <%= review.created_on %>
+                  <%= review.created_on.to_date %>
                 </td>
                 <td>
                   <%= review.updated_on %>
