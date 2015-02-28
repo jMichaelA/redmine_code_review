@@ -22,7 +22,7 @@
                             :repository_id => @repository.identifier_param,
                             :path => to_path_param(@path),
                             :rev=> @rev},
-                           :method => 'get') do %>
+                            :method => 'get') do %>
                 <p>
                   <%= l(:label_view_diff) %>: <!-- TODO (jchristensen) Make this actually work... -->
                   <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>

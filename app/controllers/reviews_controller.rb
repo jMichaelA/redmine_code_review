@@ -31,8 +31,18 @@ class ReviewsController < ApplicationController
 
   end
 
-  def add_approver
+  def add_user
 
+  end
+
+  def remove_user
+    user = params[:user_id]
+    review = params[:review_id]
+    type = params[:type]
+
+    rp = ReviewParticipant.where("user_id = 5 AND review_id = 1").take
+
+    id = params[:id]
   end
 
   # TODO Uncomment and implement these when needed
