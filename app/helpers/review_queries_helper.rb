@@ -76,9 +76,9 @@ module ReviewQueriesHelper
   def column_value(column, review, value)
     case column.name
       when :id
-        link_to value, review_path(review)
+        link_to_review(review, :text => value)
       when :description
-        link_to value, review_path(review)
+        link_to_review(review, :text=> value)
       when :done_ratio
         progress_bar(value, :width => '80px')
       else
@@ -145,35 +145,14 @@ module ReviewQueriesHelper
       @query.project = @project
       session[:query] = {:id => @query.id, :project_id => @query.project_id}
       sort_clear
-    elsif api_request? || params[:set_filter] || session[:query].nil? || session[:query][:project_id] != (@project ? @project.id : nil)
+    else
       # Give it a name, required to be valid
       @query = ReviewQuery.new(:name => "_")
       @query.project = @project
       @query.build_from_params(params)
       session[:query] = {:project_id => @query.project_id, :filters => @query.filters, :group_by => @query.group_by, :column_names => @query.column_names}
-    else
-      # retrieve from session
-      @query = nil
-      @query = ReviewQuery.find_by_id(session[:query][:id]) if session[:query][:id]
-      @query ||= ReviewQuery.new(:name => "_", :filters => session[:query][:filters], :group_by => session[:query][:group_by], :column_names => session[:query][:column_names])
-      @query.project = @project
     end
   end
 
-  def retrieve_query_from_session
-    if session[:query]
-      if session[:query][:id]
-        @query = ReviewQuery.find_by_id(session[:query][:id])
-        return unless @query
-      else
-        @query = ReviewQuery.new(:name => "_", :filters => session[:query][:filters], :group_by => session[:query][:group_by], :column_names => session[:query][:column_names])
-      end
-      if session[:query].has_key?(:project_id)
-        @query.project_id = session[:query][:project_id]
-      else
-        @query.project = @project
-      end
-      @query
-    end
-  end
+
 end

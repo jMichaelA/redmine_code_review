@@ -1,13 +1,10 @@
 
-
 class ReviewsQueriesController < ApplicationController
   menu_item :Reviews
   before_filter :find_query, :except => [:new, :create, :index]
   before_filter :find_optional_project, :only => [:new, :create]
 
   accept_api_auth :index
-
-  include QueriesHelper
 
   def index
     case params[:format]

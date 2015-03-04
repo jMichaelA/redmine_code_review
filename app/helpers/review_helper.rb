@@ -98,6 +98,13 @@ module ReviewHelper
     output.html_safe
   end
 
+  def review_list(reviews, &block)
+    ancestors = []
+    @review.each do |review|
+      yield review, 0
+    end
+  end
+
   def link_to_review(review, options = {})
     if options[:text].present?
       text = options[:text]

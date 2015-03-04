@@ -4,3 +4,4 @@ en:
   label_review: Review
   label_review_plural: Reviews
   label_review_watchers: Watchers
+  setting_reviews_export_limit: Reviews export limit
