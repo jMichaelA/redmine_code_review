@@ -1,4 +1,6 @@
 # English strings go here for Rails i18n
 en:
   # my_label: "My label"
-  label_review: "Review"
+  label_review: Review
+  label_review_plural: Reviews
+  label_review_watchers: Watchers

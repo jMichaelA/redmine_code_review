@@ -20,6 +20,7 @@ class ReviewsController < ApplicationController
     @review = Review.find(params[:review_id])
     @changeset = Changeset.find(@review.changeset_id)
     @repository = Repository.find(@changeset.repository_id)
+    @available_watchers = @review.watcher_users
 
     if params[:file_id]
       review_diff

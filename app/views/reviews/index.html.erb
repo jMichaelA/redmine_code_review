@@ -1,9 +1,6 @@
 
-<div id="main">
-  <div id="sidebar">
 
-  </div>
-  <div id="content">
+
     <h2>Reviews</h2>
     <%= form_tag({ :controller => 'reviews', :action => 'index', :project_id => @project },
                  :method => :get, :id => 'query_form') do %>
@@ -14,6 +11,11 @@
               <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
               <div style="<%= "display: none;" %>">
 
+
+                <p class="buttons">
+                  <%= link_to_function l(:button_apply), 'submit_query_form("query_form")', :class => 'icon icon-checked' %>
+                  <%= link_to l(:button_clear), { :set_filter => 1, :project_id => @project }, :class => 'icon icon-reload'  %>
+                </p>
               </div>
             </fieldset>
 
@@ -43,7 +45,7 @@
                 </td>
                 <td>
                   <% if review.changeset.present? %>
-                    <%= link_to_review(review, :text => review.changeset.comments.truncate(40)) %>
+                    <%= link_to_review(review, :text => review.changeset.comments.truncate(80)) %>
                   <% end %>
                 </td>
                 <td>
@@ -69,5 +71,9 @@
         </table>
       </form>
     </fieldset>
-  </div>
-</div>
+
+
+    <% content_for :sidebar do %>
+        <%= render :partial => 'reviews/sidebar' %>
+    <% end %>
+

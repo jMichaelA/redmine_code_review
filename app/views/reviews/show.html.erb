@@ -81,7 +81,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td>Figure out how to get watchers</td></tr>
+                  <% if !@available_watchers.nil? %>
+                    <% @available_watchers.each do |watcher| %>
+                    <tr><td><%= watcher %></td></tr>
+                    <% end %>
+                  <% end %>
                   </tbody>
                 </table>
               </td>
