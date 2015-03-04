@@ -33,7 +33,7 @@ class ReviewsController < ApplicationController
   end
 
   def create_review
-    @review = Review.create(:changeset_id => params[:changeset_id], :project_id => @project.id, :user_id => params[:user_id], :priority_id => '2')
+    @review = Review.create(:changeset_id => params[:changeset_id], :project_id => @project.id, :user_id => params[:user_id], :priority_id => params[:review_priority_id])
     # create review files
 
     @changefiles = Change.where("changeset_id = ?", @review.changeset_id)

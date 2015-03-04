@@ -1,19 +1,9 @@
 <h2>ReviewController#new</h2>
 
-Hello new view
 <div id="all_attributes">
-  <p>Text in the div</p>
-
-  <p>project id param: <%= params[:id] %></p>
-
-  <p>Rev id param: <%= params[:rev] %></p>
-
-  <p>User: <%= User.current.id %></p>
 </div>
 
-<%= title "New review" %>
-
-
+<%= title "New review for revision " + Changeset.find(params[:rev]).revision %>
 
 <%= form_tag({:action => 'create_review',
               :id => @project,
@@ -33,17 +23,19 @@ Hello new view
           <div class="splitcontentleft">
 
             <p>
-              <label for="review_priority_id">Priority<span class="required"> *</span>
-            </label>
-              <select id="review_priority_id" name="review[priority_id]">
-                <option value="1">Low</option>
-              <option value="2" selected="selected">Normal</option>
-              <option value="3">High</option>
-              <option value="4">Urgent</option>
-              <option value="5">Immediate</option>
-            </select>
-            </p>
+              <label for="review_priority_id">Priority<span class="required"> *</span></label>
 
+              <%= select_tag(:review_priority_id, options_for_select(
+                  [
+                    ['Low', 1],
+                    ['Normal', 2],
+                    ['High', 3],
+                    ['Urgent', 4],
+                    ['Immediate', 5]
+                  ], 2  # Selects "Normal" by default
+                )
+              ) %>
+            </p>
 
             <p id="start_date_area">
               <label for="review_start_date">Start
@@ -72,10 +64,16 @@ Hello new view
           </div>
 
           <div class="splitcontentright">
-
-            <p>Participants here</p>
-
-
+            <table>
+              <tr>
+                <td>Reviewers</td><td>Add button</td> <!-- dialog for adding a new reviewer. we need some list of reviewers/observers to then send with creation-->
+                <td>Watchers</td><td>Add button</td>
+              </tr>
+              <tr>
+                <td>Name</td><td>Remove button</td>
+                <td>Name</td><td>Remove button</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>

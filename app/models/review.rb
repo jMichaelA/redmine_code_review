@@ -3,6 +3,7 @@ class Review < ActiveRecord::Base
   belongs_to :user
   belongs_to :changeset
   belongs_to :project
+  belongs_to :priority, :class_name => 'IssuePriority', :foreign_key => 'priority_id'
   has_many :review_participants
   has_many :review_files
 
