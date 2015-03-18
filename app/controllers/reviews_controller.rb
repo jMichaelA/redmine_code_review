@@ -82,8 +82,9 @@ class ReviewsController < ApplicationController
 
   end
 
-  def new
-
+  def new # called when the page new is rendered
+    @changeset = Changeset.find(params[:rev])
+    @repository = Repository.find(@changeset.repository_id)
   end
 
   def create_review
