@@ -1,101 +1,100 @@
-<h2>ReviewController#new</h2>
+<script>
+  document.getElementById("content").style.minHeight = "0px";
+</script>
 
-<div id="all_attributes">
-</div>
+  <h2>New review for revision
+    <%= link_to_revision(@changeset.revision, @repository, :text => format_revision(@changeset)) %>
+  </h2>
 
-<%= title "New review for revision " + Changeset.find(params[:rev]).revision %>
+  <%= form_tag({:action => 'create_review',
+                  :id => @project,
+                  :user_id => User.current.id,
+                  :changeset_id => params[:rev]},
+                 :method => 'post') do %>
 
-<%= form_tag({:action => 'create_review',
-              :id => @project,
-              :user_id => User.current.id,
-              :changeset_id => params[:rev]},
-             :method => 'post') do %>
+  <%#= labelled_form_for @issue, :url => project_issues_path(@project),
+                          :html => {:id => 'issue-form', :multipart => true} do |f| %>
 
-<%#= labelled_form_for @issue, :url => project_issues_path(@project),
-                      :html => {:id => 'issue-form', :multipart => true} do |f| %>
+      <%= error_messages_for 'review' %>
+      <div class="box tabular">
+        <div id="all_attributes">
+          <div class="splitcontent">
+            <div class="splitcontentleft">
+              <p>
+                <label for="review_priority_id">Priority<span class="required"> *</span></label>
+                <%= select_tag(:review_priority_id, options_for_select(
+                    [
+                      ['Low', 1],
+                      ['Normal', 2],
+                      ['High', 3],
+                      ['Urgent', 4],
+                      ['Immediate', 5]
+                    ], 2  # Selects "Normal" by default
+                  )
+                ) %>
+              </p>
 
-    <%= error_messages_for 'review' %>
-    <div class="box tabular">
-      <div id="all_attributes">
+              <p id="start_date_area">
+                <label for="review_start_date">Start
+                  date</label><input class="hasDatepicker" id="review_start_date" name="review[start_date]" size="10" value="2015-02-21" type="text"><img title="..." alt="..." src="/images/calendar.png?1420968011" class="ui-datepicker-trigger">
+                <script type="text/javascript">
+                    //<![CDATA[
+                    $(function () {
+                        $('#review_start_date').datepicker(datepickerOptions);
+                    });
+                    //]]>
+                </script>
+              </p>
 
+              <p id="due_date_area">
+                <label for="review_due_date">Due
+                  date</label><input class="hasDatepicker" id="review_due_date" name="review[due_date]" size="10" type="text"><img title="..." alt="..." src="/images/calendar.png?1420968011" class="ui-datepicker-trigger">
+                <script type="text/javascript">
+                    //<![CDATA[
+                    $(function () {
+                        $('#review_due_date').datepicker(datepickerOptions);
+                    });
+                    //]]>
+                </script>
+              </p>
 
-        <div class="splitcontent">
-          <div class="splitcontentleft">
+            </div>
 
-            <p>
-              <label for="review_priority_id">Priority<span class="required"> *</span></label>
-
-              <%= select_tag(:review_priority_id, options_for_select(
-                  [
-                    ['Low', 1],
-                    ['Normal', 2],
-                    ['High', 3],
-                    ['Urgent', 4],
-                    ['Immediate', 5]
-                  ], 2  # Selects "Normal" by default
-                )
-              ) %>
-            </p>
-
-            <p id="start_date_area">
-              <label for="review_start_date">Start
-                date</label><input class="hasDatepicker" id="review_start_date" name="review[start_date]" size="10" value="2015-02-21" type="text"><img title="..." alt="..." src="/images/calendar.png?1420968011" class="ui-datepicker-trigger">
-              <script type="text/javascript">
-                  //<![CDATA[
-                  $(function () {
-                      $('#review_start_date').datepicker(datepickerOptions);
-                  });
-                  //]]>
-              </script>
-            </p>
-
-            <p id="due_date_area">
-              <label for="review_due_date">Due
-                date</label><input class="hasDatepicker" id="review_due_date" name="review[due_date]" size="10" type="text"><img title="..." alt="..." src="/images/calendar.png?1420968011" class="ui-datepicker-trigger">
-              <script type="text/javascript">
-                  //<![CDATA[
-                  $(function () {
-                      $('#review_due_date').datepicker(datepickerOptions);
-                  });
-                  //]]>
-              </script>
-            </p>
-
-          </div>
-
-          <div class="splitcontentright">
-            <table>
-              <tr>
-                <td>Reviewers</td><td>Add button</td> <!-- dialog for adding a new reviewer. we need some list of reviewers/observers to then send with creation-->
-                <td>Watchers</td><td>Add button</td>
-              </tr>
-              <tr>
-                <td>Name</td><td>Remove button</td>
-                <td>Name</td><td>Remove button</td>
-              </tr>
-            </table>
+            <div class="splitcontentright">
+              <table>
+                <tr>
+                  <!--<td>Reviewers</td><td>Add button</td> <!-- dialog for adding a new reviewer. we need some list of reviewers/observers to then send with creation-->
+                  <!-- <td>Watchers</td><td>Add button</td> -->
+                </tr>
+                <tr>
+                  <td>Name</td><td>Remove button</td>
+                  <td>Name</td><td>Remove button</td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
+
+        <% include_calendar_headers_tags %>
+
+
+        <%= javascript_tag do %>
+            $(document).ready(function(){
+            $("#issue_tracker_id, #issue_status_id").each(function(){
+            $(this).val($(this).find("option[selected=selected]").val());
+            });
+            });
+        <% end %>
+
       </div>
 
-      <% include_calendar_headers_tags %>
+  </div> <!-- closing tag for the opening "content" div -->
 
-
-      <%= javascript_tag do %>
-          $(document).ready(function(){
-          $("#issue_tracker_id, #issue_status_id").each(function(){
-          $(this).val($(this).find("option[selected=selected]").val());
-          });
-          });
-      <% end %>
-
-    </div>
-
-    </div>
-
-    <%= submit_tag l(:button_create) %>
+  <%= submit_tag l(:button_create) %>
 <% end %>
 
 <% content_for :header_tags do %>
     <%= robot_exclusion_tag %>
 <% end %>
+
+<% title "Creating review" %>
