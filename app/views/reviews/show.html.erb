@@ -35,7 +35,7 @@
           </tr>
           <tr>
             <th>Priority:</th>
-            <td>Critical</td>
+            <td><%= @review.priority.name %></td>
           </tr>
           <tr>
             <th>% Done:</th>
@@ -81,7 +81,11 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td></td></tr>
+                  <% if !@available_watchers.nil? %>
+                    <% @available_watchers.each do |watcher| %>
+                    <tr><td><%= watcher %></td></tr>
+                    <% end %>
+                  <% end %>
                   </tbody>
                 </table>
               </td>
@@ -155,7 +159,7 @@
 
 <!-- TODO: (jchristensen) The section below creates the html page title. We should update this so it says review -->
 <%
-   title = "#{l(:label_revision)} #{format_revision(@changeset)}"
+   title = "#{l(:label_review)} #{@review.id}"
    title << " - #{@changeset.comments.truncate(80)}"
    html_title(title)
 -%>

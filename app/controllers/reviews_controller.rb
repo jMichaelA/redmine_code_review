@@ -5,21 +5,76 @@ class ReviewsController < ApplicationController
   before_filter :find_project # TODO (jchristensen) Add before_filter :authorize when ready
   menu_item :redmine_code_review
 
+
   helper :watchers
   include WatchersHelper
   helper RepositoriesHelper
   helper ReviewHelper
+  include ReviewQueriesHelper
+  helper :review_queries
+  include SortHelper
+  helper :sort
+
 
   def index
-    @reviews = Review.where('project_id = ?', @project.id)
-    @review_column_names = ['#', 'Revision','Project', 'Submitted By', 'Due Date',
-                            'Priority', 'Created On', 'Updated', 'Closed']
+    #@reviews = Review.where('project_id = ?', @project.id)
+    #@review_column_names = ['#', 'Revision','Description', 'Submitted By', 'Due Date',
+    #                        'Priority', 'Created On', 'Updated', 'Closed']
+    retrieve_query
+    sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
+    sort_update(@query.sortable_columns)
+    @query.sort_criteria = sort_criteria.to_a
+
+    if @query.valid?
+      case params[:format]
+        when 'csv', 'pdf'
+          @limit = Setting.reviews_export_limit.to_i
+          if params[:columns] == 'all'
+            @query.column_names = @query.available_inline_columns.map(&:name)
+          end
+        when 'atom'
+          @limit = Setting.feeds_limit.to_i
+        when 'xml', 'json'
+          @offset, @limit = api_offset_and_limit
+          @query.column_names = %w(author)
+        else
+          @limit = per_page_option
+      end
+
+      @review_count = @query.review_count
+      @review_pages = Paginator.new @review_count, @limit, params['page']
+      @offset ||= @review_pages.offset
+      @review = @query.reviews(:include => [:priority],
+                              :order => sort_clause,
+                              :offset => @offset,
+                              :limit => @limit)
+      @review_count_by_group = @query.review_count_by_group
+
+      respond_to do |format|
+        format.html { render :template => 'reviews/index', :layout => !request.xhr? }
+        format.api  {
+          Review.load_visible_relations(@reviews) if include_in_api_response?('relations')
+        }
+        format.atom { render_feed(@reviews, :title => "#{@project || Setting.app_title}: #{l(:label_reviews_plural)}") }
+        format.csv  { send_data(query_to_csv(@reviews, @query, params), :type => 'text/csv; header=present', :filename => 'reviews.csv') }
+        format.pdf  { send_data(reviews_to_pdf(@reviews, @project, @query), :type => 'application/pdf', :filename => 'reviews.pdf') }
+      end
+    else
+      respond_to do |format|
+        format.html { render(:template => 'reviews/index', :layout => !request.xhr?) }
+        format.any(:atom, :csv, :pdf) { render(:nothing => true) }
+        format.api { render_validation_errors(@query) }
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    render_404
   end
 
   def show
     @review = Review.find(params[:review_id])
     @changeset = Changeset.find(@review.changeset_id)
     @repository = Repository.find(@changeset.repository_id)
+    @available_watchers = @review.watcher_users
 
     if params[:file_id]
       review_diff
@@ -27,8 +82,22 @@ class ReviewsController < ApplicationController
 
   end
 
-  def new
+  def new # called when the page new is rendered
+    @changeset = Changeset.find(params[:rev])
+    @repository = Repository.find(@changeset.repository_id)
+  end
 
+  def create_review
+    @review = Review.create(:changeset_id => params[:changeset_id], :project_id => @project.id, :user_id => params[:user_id], :priority_id => params[:review_priority_id])
+    # create review files
+
+    @changefiles = Change.where("changeset_id = ?", @review.changeset_id)
+
+    @changefiles.each do |file|
+      ReviewFile.create(:review_id => @review.id, :change_id => file.id)
+    end
+
+    redirect_to review_path(:id => @project.id, :review_id => @review.id) # review that was just created
   end
 
   def add_user
