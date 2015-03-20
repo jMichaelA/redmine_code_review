@@ -50,7 +50,7 @@ module ReviewHelper
         else
           file.change
       end
-    end.compact
+    end
 
     tree = { }
     files.each do |file|

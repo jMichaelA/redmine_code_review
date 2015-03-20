@@ -22,7 +22,7 @@
                             :repository_id => @repository.identifier_param,
                             :path => to_path_param(@path),
                             :rev=> @rev},
-                           :method => 'get') do %>
+                            :method => 'get') do %>
                 <p>
                   <%= l(:label_view_diff) %>: <!-- TODO (jchristensen) Make this actually work... -->
                   <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
@@ -42,11 +42,11 @@
             <tr>
               <th class="line-num"><%= line.nb_line_left %></th>
               <td class="line-code <%= line.type_diff_left %>">
-                <pre onmouseover="this.style.backgroundColor = 'Khaki';" onmouseout="this.style.backgroundColor = '';"><%= line.html_line_left.html_safe %></pre>
+                <pre onmouseover="this.style.backgroundColor = 'Khaki';" onmouseout="this.style.backgroundColor = '';" onclick="handle_code_line_click('Testing!');"><%= line.html_line_left.html_safe %></pre>
               </td>
                 <th class="line-num"><%= line.nb_line_right %></th>
                 <td class="line-code <%= line.type_diff_right %>">
-                  <pre onmouseover="this.style.backgroundColor = 'Khaki';" onmouseout="this.style.backgroundColor = '';"><%= line.html_line_right.html_safe %></pre>
+                  <pre onmouseover="this.style.backgroundColor = 'Khaki';" onmouseout="this.style.backgroundColor = '';" onclick="handle_code_line_click('Testing!');"><%= line.html_line_right.html_safe %></pre>
                 </td>
             </tr>
           <% end -%>
@@ -56,8 +56,26 @@
       <table class="filecontent">
         <thead>
           <tr>
-            <th colspan="3" class="filename">
-              <%= table_file.file_name %>
+            <th colspan="2" class="filename">
+              <%= table_file.file_name %> Bob was here
+                <div class="contextual" style=" float:left; padding-left: 0px;">
+                  <a href="" class="icon" style="font-weight: normal; background-image: url('http://localhost:3000/images/true.png');" rel="nofollow">Approve file</a>
+                  <a href="" class="icon" style="font-weight: normal; background-image: url('http://localhost:3000/images/false.png');" rel="nofollow">Reject file</a>
+                </div>
+            </th>
+            <th valign="top" class="filename" style="text-align: right; text-decoration: none;">
+              <%= form_tag({:action => 'show',
+                            :id => @project,
+                            :repository_id => @repository.identifier_param,
+                            :path => to_path_param(@path),
+                            :rev=> @rev},
+                           :method => 'get') do %>
+                <p>
+                  <%= l(:label_view_diff) %>: <!-- TODO (jchristensen) Make this actually work... -->
+                  <label><%= radio_button_tag 'type', 'inline', @diff_type != 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_inline) %></label>
+                  <label><%= radio_button_tag 'type', 'sbs', @diff_type == 'sbs', :onchange => "this.form.submit()" %> <%= l(:label_diff_side_by_side) %></label>
+                </p>
+              <% end %>
             </th>
           </tr>
         </thead>
@@ -81,5 +99,10 @@
     <% end -%>
   </div>
 <% end -%>
+
+
+<% content_for :header_tags do %>
+  <%= javascript_include_tag 'review', :plugin => 'redmine_code_review' %>
+<% end %>
 
 <%= l(:text_diff_truncated) if diff.truncated? %>

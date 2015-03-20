@@ -100,6 +100,20 @@ class ReviewsController < ApplicationController
     redirect_to review_path(:id => @project.id, :review_id => @review.id) # review that was just created
   end
 
+  def add_user
+
+  end
+
+  def remove_user
+    user = params[:user_id]
+    review = params[:review_id]
+    type = params[:type]
+
+    rp = ReviewParticipant.where("user_id = 5 AND review_id = 1").take
+
+    id = params[:id]
+  end
+
   # TODO Uncomment and implement these when needed
   # def add_comment
   # end

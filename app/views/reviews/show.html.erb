@@ -63,12 +63,12 @@
                 <table>
                   <thead>
                     <tr>
-                      <td style="font-weight: bold; text-decoration: underline;">Approvers (<a href="">Add</a>)</td>
+                      <td><p style="font-weight: bold; text-decoration: underline; display: inline;">Approvers</p> <%= link_to('(Edit)', :controller => 'participants', :action => 'new', :project_id => @project, :type => 'approver', remote: true) %></td>
                     </tr>
                   </thead>
                   <tbody>
                     <% @review.review_participants.each do |participant| -%>
-                      <tr><td> <%= link_to_user(participant.user) %></td></tr>
+                      <tr><td> <%= link_to_user(participant.user) %> <%= link_to('Remove', :controller => 'reviews', :action => 'remove_user', :id => @project, :user_id => participant.user, :type => 'approver', remote: true) %></td></tr>
                     <% end %>
                   </tbody>
                 </table>
@@ -77,7 +77,7 @@
                 <table>
                   <thead>
                     <tr>
-                      <td style="font-weight: bold; text-decoration: underline;">Watchers (<a href="">Add</a>)</td>
+                      <td><p style="font-weight: bold; text-decoration: underline; display: inline;">Watchers</p> <%= link_to('(Edit)', :controller => 'watchers', :action => 'new', :project_id => @project, remote: true) %></td>
                     </tr>
                   </thead>
                   <tbody>
