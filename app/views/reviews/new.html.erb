@@ -2,6 +2,14 @@
   document.getElementById("content").style.minHeight = "0px";
 </script>
 
+<!--<script type="text/javascript">-->
+    <!--function updateApprovers() {-->
+        <!--var list = document.getElementById('approversDatalist');-->
+        <!--var selectedValue = list.options[list.selectedIndex].value;-->
+        <!--alert(selectedValue);-->
+    <!--}-->
+<!--</script>-->
+
   <h2>New review for revision
     <%= link_to_revision(@changeset.revision, @repository, :text => format_revision(@changeset)) %>
   </h2>
@@ -62,13 +70,25 @@
 
             <div class="splitcontentright">
               <table>
+                <datalist id="approvers"> <!-- onchange="updateApprovers();"> -->
+                  <!-- populate data list options: value = user_id, text = user name -->
+                  <% @possible_approvers.each do |p|  %>
+                    <option value="<%= p.user_id %>">
+                      <% @approver = User.find(p.user_id) %>
+                      <%= @approver.firstname + " " +  @approver.lastname %>
+                    </option>
+                  <% end %>
+                </datalist>
                 <tr>
                   <!--<td>Reviewers</td><td>Add button</td> <!-- dialog for adding a new reviewer. we need some list of reviewers/observers to then send with creation-->
                   <!-- <td>Watchers</td><td>Add button</td> -->
                 </tr>
                 <tr>
-                  <td>Name</td><td>Remove button</td>
-                  <td>Name</td><td>Remove button</td>
+                  <td><input type="text" list="approvers"></td>
+                  <td>Watcher</td><td>Remove button</td>
+
+
+
                 </tr>
               </table>
             </div>
