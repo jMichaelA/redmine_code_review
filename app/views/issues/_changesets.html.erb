@@ -1,0 +1,26 @@
+<% changesets.each do |changeset| %>
+    <div class="changeset <%= cycle('odd', 'even') %>">
+    <p>
+      <table style="width:100%">
+        <tr>
+          <td style="text-align:left; padding:0px">
+      <%= link_to_revision(changeset, changeset.repository,
+                            :text => "#{l(:label_revision)} #{changeset.format_identifier}") %>
+          </td>
+          <td style="text-align:right; padding:0px">
+      <% review = Review.where(changeset_id: changeset.id).first
+         if not review.nil? %>
+          <!-- TODO: (jdevenport) Add percent complete -->
+          <%= link_to('Review', {:controller => 'reviews', :action => 'show', :review_id => review.id}, :class => 'icon icon-checked') %>
+      <% else %>
+                <%= link_to('Create Review', {:controller => 'reviews', :action => 'new', :rev => changeset.id },  :class => 'icon icon-add') %>
+      <% end %>
+          </td>
+        </tr>
+      </table>
+            <span class="author"><%= authoring(changeset.committed_on, changeset.author) %></span>
+    <div class="wiki">
+        <%= textilizable(changeset, :comments) %>
+    </div>
+    </div>
+<% end %>
