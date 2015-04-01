@@ -5,8 +5,8 @@
 <script type="text/javascript">
     function updateApprovers() {
         console.log("In updateApprovers");
-        var list = document.getElementById('approvers');
-        var selectedValue = list.options[list.selectedIndex].value;
+        var list = document.getElementById('approverInputBox');
+        var selectedValue = list.value;
         console.log("Selected value: " + selectedValue);
     }
 </script>
@@ -71,7 +71,7 @@
 
             <div class="splitcontentright">
               <table>
-                <datalist id="approvers" onchange="updateApprovers();">
+                <datalist id="approvers">
                   <!-- populate data list options: value = user_id, text = user name -->
                   <% @possible_approvers.each do |p|  %>
                     <option value="<%= p.user_id %>">
@@ -85,7 +85,7 @@
                   <!-- <td>Watchers</td><td>Add button</td> -->
                 </tr>
                 <tr>
-                  <td><input type="text" list="approvers"></td>
+                  <td><input type="text" list="approvers" id="approverInputBox" onselect="updateApprovers();"></td>
                   <td>Watcher</td><td>Remove button</td>
 
 
