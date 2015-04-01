@@ -3,11 +3,19 @@
 </script>
 
 <script type="text/javascript">
+    var approverList = [];
+
     function updateApprovers() {
         console.log("In updateApprovers");
         var list = document.getElementById('approverInputBox');
         var selectedValue = list.value;
         console.log("Selected value: " + selectedValue);
+        approverList.push(selectedValue);
+        list.value = "";
+        // update the options contained in the datalist (modify the datalist object, remove option)
+        // render the list of approvers, put it under/over the text box (modify innerHTML of the list)
+        // add a table in the td under input box? add tr's for each approver added
+        // the list of approvers should be submitted with the form (hidden inputs)
     }
 </script>
 
@@ -81,14 +89,24 @@
                   <% end %>
                 </datalist>
                 <tr>
-                  <!--<td>Reviewers</td><td>Add button</td> <!-- dialog for adding a new reviewer. we need some list of reviewers/observers to then send with creation-->
-                  <!-- <td>Watchers</td><td>Add button</td> -->
+                  <td><input type="text" list="approvers" id="approverInputBox" onselect="updateApprovers();"></td>
+                  <td>TODO add input for watchers</td>
                 </tr>
                 <tr>
-                  <td><input type="text" list="approvers" id="approverInputBox" onselect="updateApprovers();"></td>
-                  <td>Watcher</td><td>Remove button</td>
-
-
+                  <table id="approverTable">
+                    <tr>
+                      <td>Approvers:</td><td>Remove:</td>
+                    </tr>
+                    <tr>
+                      <td>Approver 1</td><td>{X}</td>
+                    </tr>
+                    <tr>
+                      <td>Approver 2</td><td>{X}</td>
+                    </tr>
+                    <tr>
+                      <td>Approver 3</td><td>{X}</td>
+                    </tr>
+                  </table>
 
                 </tr>
               </table>
