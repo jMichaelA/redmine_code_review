@@ -85,6 +85,13 @@ class ReviewsController < ApplicationController
   def new # called when the page new is rendered
     @changeset = Changeset.find(params[:rev])
     @repository = Repository.find(@changeset.repository_id)
+    # TODO: update this to use the specified permissions (currently gets all involved with the project)
+    @possible_approvers = Member.find_all_by_project_id(@repository.project_id).uniq
+    # Use this foreach to strip out potential approvers that don't have appropriate permissions
+    #@possible_approvers.each do |approver|
+    #  if approver.
+    #end
+    @possible_watchers = Member.find_all_by_project_id(@repository.project_id).uniq
   end
 
   def create_review
