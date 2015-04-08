@@ -22,6 +22,10 @@ class Review < ActiveRecord::Base
     #Nothing here yet
   end
 
+  def subject
+    self.changeset.comments
+  end
+
   def description
     self.changeset.comments
   end
