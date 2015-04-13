@@ -1,0 +1,44 @@
+<%  list_of_approvers = []
+
+    possible_approvers.each do |approver|
+      user_info = [approver.lastname + ", " + approver.firstname, approver.id]
+      list_of_approvers.push(user_info)
+    end
+%>
+
+<table class="query-columns">
+  <tr>
+    <td style="padding-left:0">
+      <%= label_tag "available_columns" %>
+      <br />
+      <%= select_tag 'available_columns',
+                     options_for_select(list_of_approvers),
+                     :multiple => true, :size => 10, :style => "width:150px",
+                     :ondblclick => "moveOptions(this.form.available_columns, this.form.selected_columns);" %>
+    </td>
+    <td class="buttons">
+      <input type="button" value="&#8594;"
+             onclick="moveOptions(this.form.available_columns, this.form.selected_columns);" /><br />
+      <input type="button" value="&#8592;"
+             onclick="moveOptions(this.form.selected_columns, this.form.available_columns);" />
+    </td>
+    <td>
+      <%= label_tag "selected_columns" %>
+      <br />
+      <%= select_tag(:review_approvers,
+                     options_for_select([]),
+                     :id => 'selected_columns', :multiple => true, :size => 10, :style => "width:150px",
+                     :ondblclick => "moveOptions(this.form.selected_columns, this.form.available_columns);") %>
+    </td>
+    <td class="buttons">
+      <input type="button" value="&#8648;" onclick="moveOptionTop(this.form.selected_columns);" /><br />
+      <input type="button" value="&#8593;" onclick="moveOptionUp(this.form.selected_columns);" /><br />
+      <input type="button" value="&#8595;" onclick="moveOptionDown(this.form.selected_columns);" /><br />
+      <input type="button" value="&#8650;" onclick="moveOptionBottom(this.form.selected_columns);" />
+    </td>
+  </tr>
+</table>
+
+<% content_for :header_tags do %>
+    <%= javascript_include_tag 'select_list_move' %>
+<% end %>
