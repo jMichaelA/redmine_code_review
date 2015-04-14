@@ -31,7 +31,7 @@
                                   :rev => @changeset.id },  :class => 'icon icon-details') %>
 <% else %>
     <%= link_to('View review', {:controller => 'reviews', :action => 'show', :id => review.project,
-                           :review_id => review.id},  :class => 'icon icon-details') %>
+                           :review_id => review.id},  :class => 'icon icon-checked') %>
 <% end %>
 <br />
 <br />

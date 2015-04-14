@@ -49,7 +49,7 @@ end %>
         <!-- TODO: (jdevenport) Add percent complete -->
         <%= link_to('', {:controller => 'reviews', :action => 'show', :review_id => review.id}, :class => 'icon icon-checked') %>
     <% else %>
-        <%= link_to('', {:controller => 'reviews', :action => 'new', :rev => changeset.id },  :class => 'icon icon-add') %>
+        <%= link_to('', {:controller => 'reviews', :action => 'new', :rev => changeset.id },  :class => 'icon icon-details') %>
     <% end %>
   </div>
 </td>
